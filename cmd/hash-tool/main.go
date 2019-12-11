@@ -11,7 +11,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/levinholsety/common-go/fileutil"
+	"github.com/levinholsety/common-go/commio"
 	"github.com/levinholsety/console-go/console"
 )
 
@@ -70,16 +70,18 @@ func hashFile(filePath string) (err error) {
 	}
 	pb := console.NewProgressBar(int(fileInfo.Size()))
 	n := 0
-	err = fileutil.ReadBlocks(filePath, 0x10000, func(block []byte) (err error) {
-		n += len(block)
-		for _, alg := range algs {
-			_, err = alg.h.Write(block)
-			if err != nil {
-				return
+	err = commio.OpenRead(filePath, func(file *os.File) error {
+		return commio.ReadBlocks(file, 0x10000, func(block []byte) (err error) {
+			n += len(block)
+			for _, alg := range algs {
+				_, err = alg.h.Write(block)
+				if err != nil {
+					return
+				}
 			}
-		}
-		pb.Progress(n)
-		return
+			pb.Progress(n)
+			return
+		})
 	})
 	if err != nil {
 		return
