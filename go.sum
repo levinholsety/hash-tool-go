@@ -1,6 +1,6 @@
-github.com/levinholsety/common-go v0.0.0-20191211030844-44eab2ec4e27 h1:UHCr16o1o8cWNQUL6hpFXKMW76BBrAODptUBJN8/H4I=
-github.com/levinholsety/common-go v0.0.0-20191211030844-44eab2ec4e27/go.mod h1:8g+nVas41Hg3evaqjneZuF4mJhQ79wylYnS3eBcmOhY=
-github.com/levinholsety/console-go v1.0.1-0.20191211045325-77427f74e551 h1:x0QV6vS9VucrwbPY7E5ajxj60Vgzp+CoITVGr7E8ScM=
-github.com/levinholsety/console-go v1.0.1-0.20191211045325-77427f74e551/go.mod h1:Tg2omGWqVX98+ybFkusD8Ad4TvOhqf77BvP/l7iMDlc=
+github.com/levinholsety/common-go v0.0.0-20191212084929-7f443f803e7a h1:BF7bTmqIVHK2D/TXk8pdQflKYt85/R+S7pVjV1Fc63I=
+github.com/levinholsety/common-go v0.0.0-20191212084929-7f443f803e7a/go.mod h1:8g+nVas41Hg3evaqjneZuF4mJhQ79wylYnS3eBcmOhY=
+github.com/levinholsety/console-go v1.0.1-0.20191212085138-e6fd3a4b9f2a h1:bS3m9n+27Q+I3v7MbjYtOygPwYV+DUWeCQun6HuqMDE=
+github.com/levinholsety/console-go v1.0.1-0.20191212085138-e6fd3a4b9f2a/go.mod h1:GOto4pxiWRKE4bb7R4p4rXhzoI00zinl/SdpwNKjioY=
 golang.org/x/sys v0.0.0-20191128015809-6d18c012aee9 h1:ZBzSG/7F4eNKz2L3GE9o300RX0Az1Bw5HF7PDraD+qU=
 golang.org/x/sys v0.0.0-20191128015809-6d18c012aee9/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
