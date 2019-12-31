@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"crypto/sha1"
 	"crypto/sha256"
+	"crypto/sha512"
 	"encoding/hex"
 	"fmt"
 	"hash"
@@ -18,6 +19,7 @@ import (
 var (
 	prtFilePath = console.NewColorPrinter(console.DefaultColor, console.LightAqua)
 	prtError    = console.NewColorPrinter(console.DefaultColor, console.LightRed)
+	prtEmphasis = console.NewColorPrinter(console.DefaultColor, console.LightWhite)
 )
 
 func main() {
@@ -67,6 +69,7 @@ func hashFile(filePath string) (err error) {
 		&hashAlg{"MD5", md5.New()},
 		&hashAlg{"SHA1", sha1.New()},
 		&hashAlg{"SHA256", sha256.New()},
+		&hashAlg{"SHA512", sha512.New()},
 	}
 	pb := console.NewProgressBar(int(fileInfo.Size()))
 	n := 0
@@ -88,7 +91,9 @@ func hashFile(filePath string) (err error) {
 	}
 	fmt.Println()
 	for _, alg := range algs {
-		fmt.Printf("%s: %s\n", alg.name, hex.EncodeToString(alg.h.Sum(nil)))
+		fmt.Printf("%s: ", alg.name)
+		prtEmphasis.Printf("%s", hex.EncodeToString(alg.h.Sum(nil)))
+		fmt.Println()
 	}
 	return
 }
