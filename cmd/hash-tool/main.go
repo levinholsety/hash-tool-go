@@ -12,7 +12,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/levinholsety/common-go/commio"
+	"github.com/levinholsety/common-go/comm"
 	"github.com/levinholsety/console-go/console"
 )
 
@@ -73,8 +73,8 @@ func hashFile(filePath string) (err error) {
 	}
 	pb := console.NewProgressBar(int(fileInfo.Size()))
 	n := 0
-	err = commio.OpenRead(filePath, func(file *os.File) error {
-		return commio.ReadBlocks(file, 0x10000, func(block []byte) (err error) {
+	err = comm.OpenRead(filePath, func(file *os.File) error {
+		return comm.ReadBlocks(file, 0x10000, func(block []byte) (err error) {
 			n += len(block)
 			for _, alg := range algs {
 				_, err = alg.h.Write(block)
