@@ -2,7 +2,12 @@ module github.com/levinholsety/hash-tool-go
 
 go 1.13
 
+replace (
+	github.com/levinholsety/common-go v0.0.0 => ..\common-go
+	github.com/levinholsety/console-go v0.0.0 => ..\console-go
+)
+
 require (
-	github.com/levinholsety/common-go v0.0.0-20200325020323-6a3517db3d36
-	github.com/levinholsety/console-go v0.0.0-20200325021858-c56af17dbda7
+	github.com/levinholsety/common-go v0.0.0
+	github.com/levinholsety/console-go v0.0.0
 )
