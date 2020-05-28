@@ -65,24 +65,22 @@ func hashFile(filePath string) (err error) {
 	fmt.Printf("Size: %d\n", fileInfo.Size())
 	fmt.Printf("Modified: %s\n", fileInfo.ModTime().Format("2006-01-02 15:04:05"))
 	algs := []*hashAlg{
-		&hashAlg{"CRC32", crc32.NewIEEE()},
-		&hashAlg{"MD5", md5.New()},
-		&hashAlg{"SHA1", sha1.New()},
-		&hashAlg{"SHA256", sha256.New()},
-		&hashAlg{"SHA512", sha512.New()},
+		{"CRC32", crc32.NewIEEE()},
+		{"MD5", md5.New()},
+		{"SHA1", sha1.New()},
+		{"SHA256", sha256.New()},
+		{"SHA512", sha512.New()},
 	}
 	pb := console.NewProgressBar(int(fileInfo.Size()))
-	n := 0
 	err = comm.OpenRead(filePath, func(file *os.File) error {
-		return comm.ReadBlocks(file, 0x10000, func(block []byte) (err error) {
-			n += len(block)
+		return comm.ReadStream(file, 0x10000, func(resp *comm.ReadResponse) (err error) {
 			for _, alg := range algs {
-				_, err = alg.h.Write(block)
+				_, err = alg.h.Write(resp.Buffer)
 				if err != nil {
 					return
 				}
 			}
-			pb.Progress(n)
+			pb.Progress(resp.TotalRead)
 			return
 		})
 	})
