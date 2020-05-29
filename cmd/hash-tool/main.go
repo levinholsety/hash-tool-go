@@ -11,6 +11,8 @@ import (
 	"hash/crc32"
 	"os"
 	"path/filepath"
+	"sync"
+	"time"
 
 	"github.com/levinholsety/common-go/comm"
 	"github.com/levinholsety/console-go/console"
@@ -64,29 +66,31 @@ func hashFile(filePath string) (err error) {
 	}
 	fmt.Printf("Size: %d\n", fileInfo.Size())
 	fmt.Printf("Modified: %s\n", fileInfo.ModTime().Format("2006-01-02 15:04:05"))
-	algs := []*hashAlg{
-		{"CRC32", crc32.NewIEEE()},
-		{"MD5", md5.New()},
-		{"SHA1", sha1.New()},
-		{"SHA256", sha256.New()},
-		{"SHA512", sha512.New()},
+	algs := hashAlgGroup{
+		{name: "CRC32", h: crc32.NewIEEE()},
+		{name: "MD5", h: md5.New()},
+		{name: "SHA1", h: sha1.New()},
+		{name: "SHA256", h: sha256.New()},
+		{name: "SHA512", h: sha512.New()},
 	}
-	pb := console.NewProgressBar(int(fileInfo.Size()))
+	pb := console.NewProgressBar(fileInfo.Size())
+	pb.SetSpeedCalculator(func(n int64, elapsed time.Duration) string {
+		if elapsed == 0 {
+			return ""
+		}
+		return "@ " + comm.FormatIOSpeed(comm.CalculateIOSpeed(n, elapsed), 0)
+	})
 	err = comm.OpenRead(filePath, func(file *os.File) error {
-		return comm.ReadStream(file, 0x10000, func(resp *comm.ReadResponse) (err error) {
-			for _, alg := range algs {
-				_, err = alg.h.Write(resp.Buffer)
-				if err != nil {
-					return
-				}
-			}
-			pb.Progress(resp.TotalRead)
+		return comm.ReadStream(file, 0x10000, func(buf []byte) (err error) {
+			algs.write(buf)
+			pb.AddProgress(int64(len(buf)))
 			return
 		})
 	})
 	if err != nil {
 		return
 	}
+	pb.Close()
 	fmt.Println()
 	for _, alg := range algs {
 		fmt.Printf("%s: ", alg.name)
@@ -99,4 +103,20 @@ func hashFile(filePath string) (err error) {
 type hashAlg struct {
 	name string
 	h    hash.Hash
+}
+
+func (p hashAlg) write(buf []byte, wg *sync.WaitGroup) {
+	p.h.Write(buf)
+	wg.Done()
+}
+
+type hashAlgGroup []*hashAlg
+
+func (p hashAlgGroup) write(buf []byte) {
+	wg := new(sync.WaitGroup)
+	for _, alg := range p {
+		wg.Add(1)
+		go alg.write(buf, wg)
+	}
+	wg.Wait()
 }
