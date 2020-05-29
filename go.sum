@@ -1,7 +1,7 @@
 github.com/levinholsety/common-go v0.0.0-20200529061204-251d3ee3b69f h1:rJ74V+NERIgJjB5qkBpN6ZiJ0t5MIIHkTXMARqBE8ZI=
 github.com/levinholsety/common-go v0.0.0-20200529061204-251d3ee3b69f/go.mod h1:8g+nVas41Hg3evaqjneZuF4mJhQ79wylYnS3eBcmOhY=
-github.com/levinholsety/console-go v0.0.0-20200529061540-702515693e15 h1:lux+kPtH4CycAHwT508/BAwCIY6VyLiUPVSbbl0zAdA=
-github.com/levinholsety/console-go v0.0.0-20200529061540-702515693e15/go.mod h1:+yojEVlsKFOG8CYO/Q+5dF7u/F+k6SI0rckVfrD1k2M=
+github.com/levinholsety/console-go v0.0.0-20200529090055-22a392ac6213 h1:rMWJ6gObkOSkGaTZPJi5cyaxQWxExfEINiwYaf2xKc4=
+github.com/levinholsety/console-go v0.0.0-20200529090055-22a392ac6213/go.mod h1:+yojEVlsKFOG8CYO/Q+5dF7u/F+k6SI0rckVfrD1k2M=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37 h1:cg5LA/zNPRzIXIWSCxQW10Rvpy94aQh3LT/ShoCpkHw=
 golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=

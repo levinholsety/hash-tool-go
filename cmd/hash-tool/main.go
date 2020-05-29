@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"crypto/sha512"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"hash"
 	"hash/crc32"
@@ -24,6 +25,10 @@ var (
 	prtEmphasis = console.NewColorPrinter(console.DefaultColor, console.LightWhite)
 )
 
+var (
+	errNotAFile = errors.New("not a file")
+)
+
 func main() {
 	if len(os.Args) > 1 {
 		hashFiles(os.Args[1:])
@@ -37,9 +42,6 @@ func printHelp() {
 }
 
 func hashFiles(filePaths []string) {
-	if len(filePaths) == 0 {
-		return
-	}
 	for _, filePath := range filePaths {
 		prtFilePath.Println(filePath)
 		err := hashFile(filePath)
@@ -54,49 +56,40 @@ func hashFiles(filePaths []string) {
 func hashFile(filePath string) (err error) {
 	fileInfo, err := os.Stat(filePath)
 	if err != nil {
-		if os.IsNotExist(err) {
-			prtError.Println("File does not exist.")
-			err = nil
-		}
 		return
 	}
 	if fileInfo.IsDir() {
-		prtError.Println("Directory is not applicable.")
+		err = errNotAFile
 		return
 	}
 	fmt.Printf("Size: %d\n", fileInfo.Size())
 	fmt.Printf("Modified: %s\n", fileInfo.ModTime().Format("2006-01-02 15:04:05"))
-	algs := hashAlgGroup{
+	algGroup := hashAlgGroup{
 		{name: "CRC32", h: crc32.NewIEEE()},
 		{name: "MD5", h: md5.New()},
 		{name: "SHA1", h: sha1.New()},
 		{name: "SHA256", h: sha256.New()},
 		{name: "SHA512", h: sha512.New()},
 	}
-	pb := console.NewProgressBar(fileInfo.Size())
-	pb.SetSpeedCalculator(func(n int64, elapsed time.Duration) string {
-		if elapsed == 0 {
-			return ""
-		}
-		return "@ " + comm.FormatIOSpeed(comm.CalculateIOSpeed(n, elapsed), 0)
-	})
-	err = comm.OpenRead(filePath, func(file *os.File) error {
-		return comm.ReadStream(file, 0x10000, func(buf []byte) (err error) {
-			algs.write(buf)
-			pb.AddProgress(int64(len(buf)))
-			return
+	err = console.ExecuteWithProgressBar(func(bar *console.ProgressBar) error {
+		bar.SetSpeedCalculator(func(n int64, elapsed time.Duration) string {
+			if elapsed == 0 {
+				return ""
+			}
+			return "@ " + comm.FormatIOSpeed(comm.CalculateIOSpeed(n, elapsed), 0)
 		})
-	})
+		return comm.OpenRead(filePath, func(file *os.File) error {
+			return comm.ReadStream(file, 0x20000, func(buf []byte) (err error) {
+				algGroup.write(buf)
+				bar.AddProgress(int64(len(buf)))
+				return
+			})
+		})
+	}, fileInfo.Size())
 	if err != nil {
 		return
 	}
-	pb.Close()
-	fmt.Println()
-	for _, alg := range algs {
-		fmt.Printf("%s: ", alg.name)
-		prtEmphasis.Printf("%s", hex.EncodeToString(alg.h.Sum(nil)))
-		fmt.Println()
-	}
+	algGroup.print()
 	return
 }
 
@@ -105,9 +98,14 @@ type hashAlg struct {
 	h    hash.Hash
 }
 
-func (p hashAlg) write(buf []byte, wg *sync.WaitGroup) {
+func (p *hashAlg) write(buf []byte, wg *sync.WaitGroup) {
 	p.h.Write(buf)
 	wg.Done()
+}
+
+func (p *hashAlg) print() {
+	fmt.Printf("\n%s: ", p.name)
+	prtEmphasis.Printf("%s", hex.EncodeToString(p.h.Sum(nil)))
 }
 
 type hashAlgGroup []*hashAlg
@@ -119,4 +117,10 @@ func (p hashAlgGroup) write(buf []byte) {
 		go alg.write(buf, wg)
 	}
 	wg.Wait()
+}
+
+func (p hashAlgGroup) print() {
+	for _, alg := range p {
+		alg.print()
+	}
 }
