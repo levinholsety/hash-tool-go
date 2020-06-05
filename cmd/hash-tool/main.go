@@ -71,24 +71,34 @@ func hashFile(filePath string) (err error) {
 		{name: "SHA256", h: sha256.New()},
 		{name: "SHA512", h: sha512.New()},
 	}
-	err = console.ExecuteWithProgressBar(func(bar *console.ProgressBar) error {
-		bar.SetSpeedCalculator(func(n int64, elapsed time.Duration) string {
-			if elapsed == 0 {
-				return ""
-			}
-			return "@ " + comm.FormatIOSpeed(comm.CalculateIOSpeed(n, elapsed), 0)
+	mq := make(chan int64, 10)
+	bar := console.NewProgressBar(fileInfo.Size())
+	bar.SetSpeedCalculator(func(n int64, elapsed time.Duration) string {
+		if elapsed == 0 {
+			return ""
+		}
+		return "@ " + comm.FormatIOSpeed(comm.CalculateIOSpeed(n, elapsed), 0)
+	})
+	wg := new(sync.WaitGroup)
+	wg.Add(1)
+	go func() {
+		for n := range mq {
+			bar.AddProgress(n)
+		}
+		wg.Done()
+	}()
+	err = comm.OpenRead(filePath, func(file *os.File) error {
+		return comm.ReadStream(file, 0x20000, func(buf []byte) (err error) {
+			algGroup.write(buf)
+			mq <- int64(len(buf))
+			return
 		})
-		return comm.OpenRead(filePath, func(file *os.File) error {
-			return comm.ReadStream(file, 0x20000, func(buf []byte) (err error) {
-				algGroup.write(buf)
-				bar.AddProgress(int64(len(buf)))
-				return
-			})
-		})
-	}, fileInfo.Size())
+	})
+	close(mq)
 	if err != nil {
 		return
 	}
+	wg.Wait()
 	algGroup.print()
 	return
 }
