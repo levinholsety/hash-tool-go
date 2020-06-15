@@ -20,9 +20,9 @@ import (
 )
 
 var (
-	prtFilePath = console.NewColorPrinter(console.DefaultColor, console.LightAqua)
-	prtError    = console.NewColorPrinter(console.DefaultColor, console.LightRed)
-	prtEmphasis = console.NewColorPrinter(console.DefaultColor, console.LightWhite)
+	prtFilePath = console.NewColorPrinter(os.Stdout).SetForegroundColor(console.LightAqua)
+	prtError    = console.NewColorPrinter(os.Stdout).SetForegroundColor(console.LightRed)
+	prtEmphasis = console.NewColorPrinter(os.Stdout).SetForegroundColor(console.LightWhite)
 )
 
 var (
