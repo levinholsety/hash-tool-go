@@ -20,9 +20,10 @@ import (
 )
 
 var (
-	prtFilePath = console.NewColorPrinter(os.Stdout).SetForegroundColor(console.LightAqua)
-	prtError    = console.NewColorPrinter(os.Stdout).SetForegroundColor(console.LightRed)
-	prtEmphasis = console.NewColorPrinter(os.Stdout).SetForegroundColor(console.LightWhite)
+	prtFilePath    = console.NewColorPrinter(os.Stdout).SetForegroundColor(console.LightAqua)
+	prtError       = console.NewColorPrinter(os.Stdout).SetForegroundColor(console.LightRed)
+	prtEmphasis    = console.NewColorPrinter(os.Stdout).SetForegroundColor(console.LightWhite)
+	prtProgressBar = console.NewColorPrinter(os.Stdout).SetForegroundColor(console.Gray)
 )
 
 var (
@@ -73,6 +74,7 @@ func hashFile(filePath string) (err error) {
 	}
 	mq := make(chan int64, 10)
 	bar := console.NewProgressBar(fileInfo.Size())
+	bar.SetColorPrinter(prtProgressBar)
 	bar.SetSpeedCalculator(func(n int64, elapsed time.Duration) string {
 		if elapsed == 0 {
 			return ""
