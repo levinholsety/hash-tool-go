@@ -8,8 +8,6 @@ Following is the content of my `tasks.json` for VSCode(Windows).
 
 ```json
 {
-    // See https://go.microsoft.com/fwlink/?LinkId=733558
-    // for the documentation about the tasks.json format
     "version": "2.0.0",
     "tasks": [{
         "label": "build-icon",
