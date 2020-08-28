@@ -63,8 +63,12 @@ func hashFile(filePath string) (err error) {
 		err = errNotAFile
 		return
 	}
-	fmt.Printf("Size: %d\n", fileInfo.Size())
-	fmt.Printf("Modified: %s\n", fileInfo.ModTime().Format("2006-01-02 15:04:05"))
+	fmt.Print("Size: ")
+	prtEmphasis.Print(fileInfo.Size())
+	fmt.Println()
+	fmt.Print("Modified: ")
+	prtEmphasis.Print(fileInfo.ModTime().Format("2006-01-02 15:04:05"))
+	fmt.Println()
 	algGroup := hashAlgGroup{
 		{name: "CRC32", h: crc32.NewIEEE()},
 		{name: "MD5", h: md5.New()},
@@ -117,7 +121,7 @@ func (p *hashAlg) write(buf []byte, wg *sync.WaitGroup) {
 
 func (p *hashAlg) print() {
 	fmt.Printf("\n%s: ", p.name)
-	prtEmphasis.Printf("%s", hex.EncodeToString(p.h.Sum(nil)))
+	prtEmphasis.Print(hex.EncodeToString(p.h.Sum(nil)))
 }
 
 type hashAlgGroup []*hashAlg
