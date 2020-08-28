@@ -39,7 +39,7 @@ func main() {
 }
 
 func printHelp() {
-	fmt.Printf("%s [files...]\n", filepath.Base(os.Args[0]))
+	fmt.Printf("%s <files>...\n", filepath.Base(os.Args[0]))
 }
 
 func hashFiles(filePaths []string) {
